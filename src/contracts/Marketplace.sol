@@ -34,40 +34,40 @@ contract Marketplace {
     }
 
     function createProduct(string memory _name, uint _price) public {
-        // Require a valid name
+        // Se requiere un ombre válido
         require(bytes(_name).length > 0);
-        // Require a valid price
+        // Se requiere un precio valido
         require(_price > 0);
-        // Increment product count
+        // Incrementar el recuento de productos
         productCount ++;
-        // Create the product
+        // Crea el producto
         products[productCount] = Product(productCount, _name, _price, msg.sender, false);
-        // Trigger an event
+        // Disparar un evento
         emit ProductCreated(productCount, _name, _price, msg.sender, false);
     }
 
     function purchaseProduct(uint _id) public payable {
-        // Fetch the product
+        // Obtener el producto
         Product memory _product = products[_id];
-        // Fetch the owner
+        // Buscar el dueño del producto
         address payable _seller = _product.owner;
-        // Make sure the product has a valid id
+        // Asegúrese de que el producto tenga una identificación válida
         require(_product.id > 0 && _product.id <= productCount);
-        // Require that there is enough Ether in the transaction
+        // Se requiere que haya suficiente Ether en la transacción
         require(msg.value >= _product.price);
-        // Require that the product has not been purchased already
+        // Es requerido que el producto aún no se haya comprado
         require(!_product.purchased);
-        // Require that the buyer is not the seller
+        // Se requiere que el comprador no sea el vendedor.
         require(_seller != msg.sender);
-        // Transfer ownership to the buyer
+        // Transferir la propiedad al comprador
         _product.owner = msg.sender;
-        // Mark as purchased
+        // Marcar como comprado
         _product.purchased = true;
-        // Update the product
+        // Actualizar el producto
         products[_id] = _product;
-        // Pay the seller by sending them Ether
+        // Paga al vendedor enviándole Ether
         address(_seller).transfer(msg.value);
-        // Trigger an event
+        // Activar un evento
         emit ProductPurchased(productCount, _product.name, _product.price, msg.sender, true);
     }
 }
